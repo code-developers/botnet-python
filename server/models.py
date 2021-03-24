@@ -4,7 +4,9 @@ from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
+
 
 class Agent(db.Model):
     __tablename__ = 'agents'
@@ -17,11 +19,11 @@ class Agent(db.Model):
     output = db.Column(db.Text(), default="")
     hostname = db.Column(db.String(100))
     username = db.Column(db.String(100))
-
+  
     def __init__(self, uid):
         self.id = uid
         self.display_name = self.id
-    
+
     def push_command(self, cmdline):
         cmd = Command()
         cmd.agent = self
@@ -29,14 +31,15 @@ class Agent(db.Model):
         cmd.timestamp = datetime.now()
         db.session.add(cmd)
         db.session.commit()
-    
+
     def rename(self, new_name):
         self.display_name = new_name
         db.session.commit()
-    
+
     def is_online(self):
         return (datetime.now() - self.last_online).seconds < 30
-    
+
+
 class Command(db.Model):
     __tablename__ = 'commands'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
